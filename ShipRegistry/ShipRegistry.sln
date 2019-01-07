@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipRegistryTests", "tests\ShipRegistryTests\ShipRegistryTests.csproj", "{46B7452F-ACA5-42EF-8600-899D94B1485E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{886B4FB2-2D05-4C22-87E7-BB835A918340}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{457DF058-F0BF-4128-9D19-9911D8BF771D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipRegistryCore", "src\ShipRegistryCore\ShipRegistryCore.csproj", "{17AEE73D-EEC8-4A59-97A8-E3C81C594DEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46B7452F-ACA5-42EF-8600-899D94B1485E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46B7452F-ACA5-42EF-8600-899D94B1485E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46B7452F-ACA5-42EF-8600-899D94B1485E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46B7452F-ACA5-42EF-8600-899D94B1485E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17AEE73D-EEC8-4A59-97A8-E3C81C594DEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17AEE73D-EEC8-4A59-97A8-E3C81C594DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17AEE73D-EEC8-4A59-97A8-E3C81C594DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17AEE73D-EEC8-4A59-97A8-E3C81C594DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{46B7452F-ACA5-42EF-8600-899D94B1485E} = {886B4FB2-2D05-4C22-87E7-BB835A918340}
+		{17AEE73D-EEC8-4A59-97A8-E3C81C594DEE} = {457DF058-F0BF-4128-9D19-9911D8BF771D}
+	EndGlobalSection
+EndGlobal
