@@ -14,15 +14,21 @@ namespace ShipRegitryTests.Ports
     [TestFixture]
     public class ShipRegistrationTests
     {
+        private DbContextOptions<ShipRegistryDbContext> _options;
+
+        [SetUp]
+        public void Setup()
+        {
+            _options = new DbContextOptionsBuilder<ShipRegistryDbContext>().UseInMemoryDatabase(databaseName: "Add_writes_to_database")
+                .Options;
+        }
+        
+        
         [Test]
         public async Task When_registering_a_new_ship()
         {
             //arrange
-            var options = new DbContextOptionsBuilder<ShipRegistryDbContext>()
-                .UseInMemoryDatabase(databaseName: "Add_writes_to_database")
-                .Options;
-
-            using (var contextFactory = new FakeShipRegistryContextFactory(options))
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
             {
                 var uow = contextFactory.Create();
                 
@@ -51,5 +57,26 @@ namespace ShipRegitryTests.Ports
                 Assert.That(ship.ShippingLineId, Is.EqualTo(newShipCommand.ShippingLine));
              }
         }
+
+        [Test]
+        public async Task When_getting_a_ship()
+        {
+            //arrange
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
+            {
+                var uow = contextFactory.Create();
+                var repository = new ShipRepositoryAsync(uow);
+                var ship = new Ship(new Id(), new ShipName("Majestic"), ShipType.Container, new Capacity(50000), new Id() );
+
+                await repository.AddAsync(ship);
+                
+                
+
+                //act
+                
+                
+                //asert
+            }
+       }
     }
 }
