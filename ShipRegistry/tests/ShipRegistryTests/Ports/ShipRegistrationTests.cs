@@ -1,5 +1,5 @@
-using System;
 using System.Linq;
+using System.Threading.Tasks;
 using FreightCaptainTests.Test_Doubles;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -9,12 +9,13 @@ using ShipRegistryCore.Application;
 using ShipRegistryCore.Ports.Commands;
 using ShipRegistryCore.Ports.Handlers;
 
-namespace Tests
+namespace ShipRegitryTests.Ports
 {
+    [TestFixture]
     public class ShipRegistrationTests
     {
         [Test]
-        public void When_registering_a_new_ship()
+        public async Task When_registering_a_new_ship()
         {
             //arrange
             var options = new DbContextOptionsBuilder<ShipRegistryDbContext>()
@@ -38,7 +39,7 @@ namespace Tests
                     shippingLine: shippingLine.Id);
 
                 //act
-                handler.HandleAsync(newShipCommand);
+                await handler.HandleAsync(newShipCommand);
 
                 //assert
                 var ship = uow.Ships.SingleOrDefault(s => s.Id == new Id(newShipCommand.Id));
