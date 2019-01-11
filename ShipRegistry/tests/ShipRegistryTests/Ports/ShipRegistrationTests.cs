@@ -8,6 +8,7 @@ using ShipRegistryCore.Adapters.Repositories;
 using ShipRegistryCore.Application;
 using ShipRegistryCore.Ports.Commands;
 using ShipRegistryCore.Ports.Handlers;
+using ShipRegistryCore.Ports.Queries;
 
 namespace ShipRegitryTests.Ports
 {
@@ -69,13 +70,20 @@ namespace ShipRegitryTests.Ports
                 var ship = new Ship(new Id(), new ShipName("Majestic"), ShipType.Container, new Capacity(50000), new Id() );
 
                 await repository.AddAsync(ship);
+
+                var query = new ShipByIdQuery(ship.Id);
                 
-                
+                var queryHandler = new ShipByIdQueryHandlerAsync(contextFactory);
 
                 //act
-                
-                
+                var foundShip = await queryHandler.ExecuteAsync(query);
+
                 //asert
+                Assert.That(foundShip.Id, Is.EqualTo(ship.Id.Value));
+                Assert.That(foundShip.Capacity, Is.EqualTo(ship.Capacity.Value));
+                Assert.That(foundShip.ShipName, Is.EqualTo(ship.ShipName.ToString()));
+                Assert.That(foundShip.ShipType, Is.EqualTo(ship.ShipType.ToString()));
+                Assert.That(foundShip.ShippingLineId, Is.EqualTo(ship.ShippingLineId.Value));
             }
        }
     }
