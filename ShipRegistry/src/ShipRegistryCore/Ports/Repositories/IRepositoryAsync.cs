@@ -10,7 +10,7 @@ namespace ShipRegistryCore.Ports.Repositories
         Task<T> AddAsync(T newEntity, CancellationToken ct = default(CancellationToken));
         Task DeleteAsync(Guid entityId, CancellationToken ct = default(CancellationToken));
         Task DeleteAllAsync(CancellationToken ct = default(CancellationToken));
-        Task<T> GetAsync(Guid entityId, CancellationToken ct = default(CancellationToken));
+        Task<T> GetAsync(Id entityId, CancellationToken ct = default(CancellationToken));
         Task UpdateAsync(T updatedEntity, CancellationToken ct = default(CancellationToken));
     }
 }

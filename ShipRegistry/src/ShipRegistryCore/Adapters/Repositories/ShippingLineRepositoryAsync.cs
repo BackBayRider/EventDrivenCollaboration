@@ -37,9 +37,9 @@ namespace ShipRegistryCore.Adapters.Repositories
             await _uow.SaveChangesAsync(ct);
         }
 
-        public async Task<ShippingLine> GetAsync(Guid entityId, CancellationToken ct = new CancellationToken())
+        public async Task<ShippingLine> GetAsync(Id entityId, CancellationToken ct = new CancellationToken())
         {
-            return await _uow.Lines.SingleAsync(t => t.Id == new Id(entityId), ct);
+            return await _uow.Lines.SingleOrDefaultAsync(t => t.Id == entityId, ct);
         }
 
         public async Task UpdateAsync(ShippingLine updatedEntity, CancellationToken ct = new CancellationToken())

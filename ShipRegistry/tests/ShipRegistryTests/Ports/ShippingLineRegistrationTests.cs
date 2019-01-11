@@ -22,7 +22,7 @@ namespace ShipRegitryTests.Ports
                 .Options;
             
 
-            var newShippingLineCommand = new NewShippingLineCommand(new LineName("Maersk"));
+            var newShippingLineCommand = new AddShippingLineCommand(new LineName("Maersk"));
 
             using (var contextFactory = new FakeShipRegistryContextFactory(options))
             {

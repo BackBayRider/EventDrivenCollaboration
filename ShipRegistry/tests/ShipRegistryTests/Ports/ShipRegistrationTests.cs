@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FreightCaptainTests.Test_Doubles;
@@ -39,7 +40,7 @@ namespace ShipRegitryTests.Ports
 
                 var handler = new NewShipRegistrationHandlerAsync(contextFactory);
 
-                var newShipCommand = new NewShipCommand(
+                var newShipCommand = new AddShipCommand(
                     type: ShipType.Tanker,
                     name: new ShipName("MV Toronto Star"),
                     capacity: new Capacity(30000),
@@ -99,18 +100,71 @@ namespace ShipRegitryTests.Ports
                 var shipTwo = new Ship(new Id(), new ShipName("Royal"), ShipType.Container, new Capacity(80000), new Id() );
 
                 await repository.AddAsync(shipOne);
+                await repository.AddAsync(shipTwo);
 
                 var query = new ShipsAllQuery();
                 
                 var queryHandler = new ShipsAllQueryHandlerAsync(contextFactory);
 
                 //act
-                var ships = await queryHandler.ExecuteAsync(query);
+                var result = await queryHandler.ExecuteAsync(query);
 
                 //asert
+                Assert.That(2, Is.EqualTo(result.Ships));
            }
              
         }
-        
+
+        [Test]
+        public async Task When_updating_an_existing_ship_name()
+        {
+            //arrange
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
+            {
+                var uow = contextFactory.Create();
+                var repository = new ShipRepositoryAsync(uow);
+                var ship = new Ship(new Id(), new ShipName("Majestic"), ShipType.Container, new Capacity(50000), new Id() );
+
+                await repository.AddAsync(ship);
+
+                var command = new UpdateShipNameCommand(ship.Id, name: new ShipName("Toronto Star"));
+
+                var handler = new UpdateShipNameCommandHandlerAsync(contextFactory);
+
+                //act
+                await handler.HandleAsync(command);
+
+                //assert
+                var updatedShip = await uow.Ships.SingleOrDefaultAsync(s => s.Id == ship.Id);
+                Assert.That(updatedShip , Is.Not.Null);
+                Assert.That(updatedShip.ShipName, Is.EqualTo(command.Name));
+            }
+        }
+
+        [Test]
+        public async Task When_updating_an_existing_ships_owner()
+        {
+            //arrange
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
+            {
+                var uow = contextFactory.Create();
+                var repository = new ShipRepositoryAsync(uow);
+                var ship = new Ship(new Id(), new ShipName("Majestic"), ShipType.Container, new Capacity(50000), new Id() );
+
+                await repository.AddAsync(ship);
+
+                var command = new UpdateShipOwnerCommand(ship.Id, new Id(Guid.NewGuid())); 
+
+                var handler = new UpdateShipOwnerCommandHandlerAsync(contextFactory); 
+
+                //act
+                await handler.HandleAsync(command);
+
+                //assert
+                var updatedShip = await uow.Ships.SingleOrDefaultAsync(s => s.Id == ship.Id);
+                Assert.That(updatedShip , Is.Not.Null);
+                Assert.That(updatedShip.ShippingLineId, Is.EqualTo(command.ShippingLineId));
+            }
+        }
     }
 }

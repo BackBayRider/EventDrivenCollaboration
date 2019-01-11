@@ -4,11 +4,11 @@ using ShipRegistryCore.Application;
 
 namespace ShipRegistryCore.Ports.Commands
 {
-    public class NewShippingLineCommand : Command
+    public class AddShippingLineCommand : Command
     {
         public LineName LineName { get; }
 
-        public NewShippingLineCommand(LineName lineName)
+        public AddShippingLineCommand(LineName lineName)
             :base(Guid.NewGuid())
         {
             LineName = lineName;

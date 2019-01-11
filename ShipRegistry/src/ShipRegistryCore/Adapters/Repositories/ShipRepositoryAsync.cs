@@ -37,11 +37,11 @@ namespace ShipRegistryCore.Adapters.Repositories
             await _uow.SaveChangesAsync(ct);
         }
 
-        public async Task<Ship> GetAsync(Guid entityId, CancellationToken ct = new CancellationToken())
+        public async Task<Ship> GetAsync(Id entityId, CancellationToken ct = new CancellationToken())
         {
-            return await _uow.Ships.SingleAsync(t => t.Id == new Id(entityId), ct);
+            return await _uow.Ships.SingleOrDefaultAsync(t => t.Id == entityId, ct);
         }
-
+        
         public async Task UpdateAsync(Ship updatedEntity, CancellationToken ct = new CancellationToken())
         {
             await _uow.SaveChangesAsync(ct);

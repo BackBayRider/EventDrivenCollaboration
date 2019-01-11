@@ -9,11 +9,11 @@ namespace ShipRegistryCore.Ports.Queries
     
     public class ShipsAllQueryResult
     {
-        public ShipByIdQueryResult[] _ships { get; }
+        public ShipByIdQueryResult[] Ships { get; }
 
         public ShipsAllQueryResult(IEnumerable<Ship> ships)
         {
-            _ships = ships.Select(s => new ShipByIdQueryResult(s)).ToArray();
+            Ships = ships.Select(s => new ShipByIdQueryResult(s)).ToArray();
         }
     }
 }

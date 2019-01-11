@@ -8,7 +8,7 @@ using ShipRegistryCore.Ports.Repositories;
 
 namespace ShipRegistryCore.Ports.Handlers
 {
-    public class NewShippingLineHandlerAsync : RequestHandlerAsync<NewShippingLineCommand>
+    public class NewShippingLineHandlerAsync : RequestHandlerAsync<AddShippingLineCommand>
     {
         private readonly IShipRegistryContextFactory _contextFactory;
 
@@ -18,7 +18,7 @@ namespace ShipRegistryCore.Ports.Handlers
         }
 
 
-        public override async Task<NewShippingLineCommand> HandleAsync(NewShippingLineCommand command, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<AddShippingLineCommand> HandleAsync(AddShippingLineCommand command, CancellationToken cancellationToken = new CancellationToken())
         {
             using (var uow = _contextFactory.Create())
             {
