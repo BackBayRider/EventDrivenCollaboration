@@ -85,6 +85,32 @@ namespace ShipRegitryTests.Ports
                 Assert.That(foundShip.ShipType, Is.EqualTo(ship.ShipType.ToString()));
                 Assert.That(foundShip.ShippingLineId, Is.EqualTo(ship.ShippingLineId.Value));
             }
-       }
+        }
+
+        [Test]
+        public async Task When_getting_all_ships()
+        {
+            //arrange
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
+            {
+                var uow = contextFactory.Create();
+                var repository = new ShipRepositoryAsync(uow);
+                var shipOne = new Ship(new Id(), new ShipName("Majestic"), ShipType.Container, new Capacity(50000), new Id() );
+                var shipTwo = new Ship(new Id(), new ShipName("Royal"), ShipType.Container, new Capacity(80000), new Id() );
+
+                await repository.AddAsync(shipOne);
+
+                var query = new ShipsAllQuery();
+                
+                var queryHandler = new ShipsAllQueryHandlerAsync(contextFactory);
+
+                //act
+                var ships = await queryHandler.ExecuteAsync(query);
+
+                //asert
+           }
+             
+        }
+        
     }
 }
