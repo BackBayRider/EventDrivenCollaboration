@@ -129,7 +129,7 @@ namespace ShipRegitryTests.Ports
 
                 var command = new UpdateShipNameCommand(ship.Id, name: new ShipName("Toronto Star"));
 
-                var handler = new UpdateShipNameCommandHandlerAsync(contextFactory);
+                var handler = new UpdateShipNameHandlerAsync(contextFactory);
 
                 //act
                 await handler.HandleAsync(command);
@@ -155,7 +155,7 @@ namespace ShipRegitryTests.Ports
 
                 var command = new UpdateShipOwnerCommand(ship.Id, new Id(Guid.NewGuid())); 
 
-                var handler = new UpdateShipOwnerCommandHandlerAsync(contextFactory); 
+                var handler = new UpdateShipOwnerHandlerAsync(contextFactory); 
 
                 //act
                 await handler.HandleAsync(command);
@@ -165,6 +165,32 @@ namespace ShipRegitryTests.Ports
                 Assert.That(updatedShip , Is.Not.Null);
                 Assert.That(updatedShip.ShippingLineId, Is.EqualTo(command.ShippingLineId));
             }
+        }
+
+        [Test]
+        public async Task When_removing_a_ship_registration()
+        {
+             //arrange
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
+            {
+                var uow = contextFactory.Create();
+                var repository = new ShipRepositoryAsync(uow);
+                var ship = new Ship(new Id(), new ShipName("Majestic"), ShipType.Container, new Capacity(50000), new Id() );
+
+                await repository.AddAsync(ship);
+
+                var command = new RemoveShipCommand(ship.Id); 
+
+                var handler = new RemoveShipHandlerAsync(contextFactory); 
+
+                //act
+                await handler.HandleAsync(command);
+
+                //assert
+                var removedShip = await uow.Ships.SingleOrDefaultAsync(s => s.Id == ship.Id);
+                Assert.That(removedShip, Is.Null);
+            }
+            
         }
     }
 }

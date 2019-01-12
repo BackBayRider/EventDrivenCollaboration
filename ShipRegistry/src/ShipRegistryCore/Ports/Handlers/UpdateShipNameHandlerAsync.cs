@@ -8,16 +8,16 @@ using ShipRegistryCore.Ports.Repositories;
 
 namespace ShipRegistryCore.Ports.Handlers
 {
-    public class UpdateShipOwnerCommandHandlerAsync : RequestHandlerAsync<UpdateShipOwnerCommand>
+    public class UpdateShipNameHandlerAsync : RequestHandlerAsync<UpdateShipNameCommand>
     {
         private readonly IShipRegistryContextFactory _contextFactory;
 
-        public UpdateShipOwnerCommandHandlerAsync(IShipRegistryContextFactory contextFactory)
+        public UpdateShipNameHandlerAsync(IShipRegistryContextFactory contextFactory)
         {
             _contextFactory = contextFactory;
         }
 
-        public override async Task<UpdateShipOwnerCommand> HandleAsync(UpdateShipOwnerCommand command, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<UpdateShipNameCommand> HandleAsync(UpdateShipNameCommand command, CancellationToken cancellationToken = new CancellationToken())
         {
             using (var uow = _contextFactory.Create())
             {
@@ -25,12 +25,12 @@ namespace ShipRegistryCore.Ports.Handlers
                 var ship = await repository.GetAsync(command.ShipId, cancellationToken);
                 if (ship == null) throw new NotFoundException($"Could not find a ship with Id {command.ShipId}");
 
-                ship.ShippingLineId = command.ShippingLineId;
+                ship.ShipName = command.Name;
 
                 await repository.UpdateAsync(ship, cancellationToken);
 
             }
-                        
+            
             return await base.HandleAsync(command, cancellationToken);
         }
     }

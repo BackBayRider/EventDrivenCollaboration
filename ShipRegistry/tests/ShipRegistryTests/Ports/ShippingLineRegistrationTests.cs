@@ -13,20 +13,24 @@ namespace ShipRegitryTests.Ports
     [TestFixture]
     public class ShippingLineRegistrationTests
     {
+        private DbContextOptions<ShipRegistryDbContext> _options;
+
+        [SetUp]
+        public void Setup()
+        {
+             _options = new DbContextOptionsBuilder<ShipRegistryDbContext>()
+                .UseInMemoryDatabase(databaseName: "Add_writes_to_database")
+                .Options;
+        }
+        
+        
         [Test]
         public async Task When_registering_a_new_shipping_line()
         {
-            //arrange
-            var options = new DbContextOptionsBuilder<ShipRegistryDbContext>()
-                .UseInMemoryDatabase(databaseName: "Add_writes_to_database")
-                .Options;
-            
-
-            var newShippingLineCommand = new AddShippingLineCommand(new LineName("Maersk"));
-
-            using (var contextFactory = new FakeShipRegistryContextFactory(options))
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
             {
-                
+                //arrange
+                var newShippingLineCommand = new AddShippingLineCommand(new LineName("Maersk"));
                 var handler = new NewShippingLineHandlerAsync(contextFactory);
                 
                 //act
@@ -42,5 +46,15 @@ namespace ShipRegitryTests.Ports
             }
 
         }
+
+        [Test]
+        public async Task When_getting_a_shipping_line()
+        {
+            using (var contextFactory = new FakeShipRegistryContextFactory(_options))
+            {
+                var query     
+            }
+        }
     }
+    
 }
