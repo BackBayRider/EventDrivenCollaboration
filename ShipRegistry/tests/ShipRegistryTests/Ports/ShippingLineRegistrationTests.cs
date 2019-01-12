@@ -7,6 +7,7 @@ using ShipRegistryCore.Adapters.Db;
 using ShipRegistryCore.Adapters.Repositories;
 using ShipRegistryCore.Application;
 using ShipRegistryCore.Ports.Commands;
+using ShipRegistryCore.Ports.Events;
 using ShipRegistryCore.Ports.Handlers;
 using ShipRegistryCore.Ports.Queries;
 
@@ -32,8 +33,10 @@ namespace ShipRegitryTests.Ports
             using (var contextFactory = new FakeShipRegistryContextFactory(_options))
             {
                 //arrange
+                var commandProcessor = new FakeCommandProcessor();
+                
                 var newShippingLineCommand = new AddShippingLineCommand(new LineName("Maersk"));
-                var handler = new NewShippingLineHandlerAsync(contextFactory);
+                var handler = new NewShippingLineHandlerAsync(contextFactory, commandProcessor);
                 
                 //act
                 await handler.HandleAsync(newShippingLineCommand);
@@ -45,7 +48,15 @@ namespace ShipRegitryTests.Ports
                 Assert.That(line, Is.Not.Null);
                 Assert.That(line.Id, Is.EqualTo(new Id(newShippingLineCommand.Id)));
                 Assert.That(line.LineName, Is.EqualTo(newShippingLineCommand.LineName));
-            }
+                
+                var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
+                Assert.That(domainEvent, Is.Not.Null);
+
+                var addedMessage = (NewLineAddedEvent) domainEvent.Message;
+                Assert.That(addedMessage, Is.Not.Null);
+                Assert.That(addedMessage.LineId, Is.EqualTo(new Id(newShippingLineCommand.Id)));
+                Assert.That(addedMessage.LineName, Is.EqualTo(newShippingLineCommand.LineName));
+              }
 
         }
 
@@ -111,9 +122,11 @@ namespace ShipRegitryTests.Ports
                 var existingLine = new ShippingLine(new Id(), new LineName("Maersk"));
                 await repository.AddAsync(existingLine);
                 
+                var commandProcessor = new FakeCommandProcessor();
+                
                 var command = new UpdateLineNameCommand(existingLine.Id, new LineName("Onassis"));
                 
-                var handler = new UpdateLineNameHandler(contextFactory);
+                var handler = new UpdateLineNameHandler(contextFactory, commandProcessor);
                 
                 //act
                 await handler.HandleAsync(command);
@@ -121,6 +134,14 @@ namespace ShipRegitryTests.Ports
                 //assert
                 var line = uow.Lines.SingleOrDefault(l => l.Id == existingLine.Id);
                 Assert.That(line.LineName, Is.EqualTo(new LineName("Onassis")));
+                Assert.That(line.Version, Is.EqualTo(1));
+                
+                var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
+                Assert.That(domainEvent, Is.Not.Null);
+
+                var addedMessage = (LineNameUpdatedEvent) domainEvent.Message;
+                Assert.That(addedMessage.LineName, Is.EqualTo(new LineName("Onassis")));
+                Assert.That(addedMessage.Version, Is.EqualTo(1));
             }
         }
 

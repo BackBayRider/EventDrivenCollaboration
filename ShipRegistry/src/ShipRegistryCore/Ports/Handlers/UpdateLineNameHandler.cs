@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Paramore.Brighter;
 using ShipRegistryCore.Adapters.Repositories;
 using ShipRegistryCore.Ports.Commands;
+using ShipRegistryCore.Ports.Events;
 using ShipRegistryCore.Ports.Exceptions;
 using ShipRegistryCore.Ports.Repositories;
 
@@ -11,10 +12,12 @@ namespace ShipRegistryCore.Ports.Handlers
     public class UpdateLineNameHandler : RequestHandlerAsync<UpdateLineNameCommand>
     {
         private readonly IShipRegistryContextFactory _contextFactory;
+        private readonly IAmACommandProcessor _commandProcessor;
 
-        public UpdateLineNameHandler(IShipRegistryContextFactory contextFactory)
+        public UpdateLineNameHandler(IShipRegistryContextFactory contextFactory, IAmACommandProcessor commandProcessor)
         {
             _contextFactory = contextFactory;
+            _commandProcessor = commandProcessor;
         }
 
         public override async Task<UpdateLineNameCommand> HandleAsync(UpdateLineNameCommand command, CancellationToken cancellationToken = new CancellationToken())
@@ -28,6 +31,8 @@ namespace ShipRegistryCore.Ports.Handlers
                 line.LineName = command.LineName;
 
                 await repository.UpdateAsync(line);
+
+                await _commandProcessor.PostAsync(new LineNameUpdatedEvent(line.Id, line.LineName, line.Version));
 
             }
             return await base.HandleAsync(command, cancellationToken);

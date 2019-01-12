@@ -7,12 +7,14 @@ namespace ShipRegistryCore.Ports.Events
     {
         public Id Lineid { get; }
         public LineName LineName { get; }
+        public int Version { get; }
 
-        public LineNameUpdatedEvent(Id lineid, LineName lineName) 
+        public LineNameUpdatedEvent(Id lineid, LineName lineName, int version) 
             : base(lineid.Value)
         {
             Lineid = lineid;
             LineName = lineName;
+            Version = version;
         }
     }
 }

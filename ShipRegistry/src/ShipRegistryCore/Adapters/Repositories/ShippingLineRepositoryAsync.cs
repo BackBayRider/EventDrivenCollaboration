@@ -44,6 +44,7 @@ namespace ShipRegistryCore.Adapters.Repositories
 
         public async Task UpdateAsync(ShippingLine updatedEntity, CancellationToken ct = new CancellationToken())
         {
+            updatedEntity.Version++;
             await _uow.SaveChangesAsync(ct);
         }
     }
