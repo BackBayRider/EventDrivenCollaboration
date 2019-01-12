@@ -16,14 +16,14 @@ namespace ShipRegistryCore.Ports.Handlers
             _contextFactory = contextFactory;
         }
 
-        public override Task<RemoveLineCommand> HandleAsync(RemoveLineCommand command, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<RemoveLineCommand> HandleAsync(RemoveLineCommand command, CancellationToken cancellationToken = new CancellationToken())
         {
             using (var uow = _contextFactory.Create())
             {
                 var repo = new ShippingLineRepositoryAsync(uow);
-                repo.DeleteAsync(command.LineId);
+                await repo.DeleteAsync(command.LineId);
             }
-            return base.HandleAsync(command, cancellationToken);
+            return await base.HandleAsync(command, cancellationToken);
         }
     }
 }

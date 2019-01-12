@@ -8,8 +8,10 @@ using ShipRegistryCore.Adapters.Db;
 using ShipRegistryCore.Adapters.Repositories;
 using ShipRegistryCore.Application;
 using ShipRegistryCore.Ports.Commands;
+using ShipRegistryCore.Ports.Events;
 using ShipRegistryCore.Ports.Handlers;
 using ShipRegistryCore.Ports.Queries;
+using Action = FreightCaptainTests.Test_Doubles.Action;
 
 namespace ShipRegitryTests.Ports
 {
@@ -37,8 +39,10 @@ namespace ShipRegitryTests.Ports
                 var lineRepo = new ShippingLineRepositoryAsync(uow);
 
                 var shippingLine = lineRepo.AddAsync(new ShippingLine(new Id(), new LineName("Maersk"))).Result;
+                
+                var commandProcessor = new FakeCommandProcessor();
 
-                var handler = new NewShipRegistrationHandlerAsync(contextFactory);
+                var handler = new NewShipRegistrationHandlerAsync(contextFactory, commandProcessor);
 
                 var newShipCommand = new AddShipCommand(
                     type: ShipType.Tanker,
@@ -57,6 +61,17 @@ namespace ShipRegitryTests.Ports
                 Assert.That(ship.Capacity, Is.EqualTo(newShipCommand.Capacity));
                 Assert.That(ship.Id, Is.EqualTo(new Id(newShipCommand.Id)));
                 Assert.That(ship.ShippingLineId, Is.EqualTo(newShipCommand.ShippingLine));
+
+                var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
+                Assert.That(domainEvent, Is.Not.Null);
+
+                var addedMessage = (NewShipAddedEvent) domainEvent.Message;
+                Assert.That(addedMessage.Id, Is.EqualTo(newShipCommand.Id));
+                Assert.That(addedMessage.Capacity, Is.EqualTo(newShipCommand.Capacity));
+                Assert.That(addedMessage.Name, Is.EqualTo(newShipCommand.Name));
+                Assert.That(addedMessage.Type, Is.EqualTo(newShipCommand.Type));
+                Assert.That(addedMessage.ShipId, Is.EqualTo(new Id(newShipCommand.Id)));
+                Assert.That(addedMessage.ShippingLine, Is.EqualTo(newShipCommand.ShippingLine));
              }
         }
 
