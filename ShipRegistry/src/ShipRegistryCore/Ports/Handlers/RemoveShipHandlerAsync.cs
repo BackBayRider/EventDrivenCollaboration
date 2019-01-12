@@ -23,7 +23,7 @@ namespace ShipRegistryCore.Ports.Handlers
             {
 
                 var repository = new ShipRepositoryAsync(uow);
-                await repository.DeleteAsync(command.ShipId.Value,cancellationToken);
+                await repository.DeleteAsync(command.ShipId, cancellationToken);
 
             }
 

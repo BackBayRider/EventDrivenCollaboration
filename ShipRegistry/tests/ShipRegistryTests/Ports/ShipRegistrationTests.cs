@@ -110,7 +110,7 @@ namespace ShipRegitryTests.Ports
                 var result = await queryHandler.ExecuteAsync(query);
 
                 //asert
-                Assert.That(2, Is.EqualTo(result.Ships));
+                Assert.That(2, Is.EqualTo(result.Ships.Length));
            }
              
         }
@@ -192,5 +192,5 @@ namespace ShipRegitryTests.Ports
             }
             
         }
-    }
+  }
 }

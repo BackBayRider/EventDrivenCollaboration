@@ -24,9 +24,9 @@ namespace ShipRegistryCore.Adapters.Repositories
             return savedItem.Entity;
         }
 
-        public async Task DeleteAsync(Guid lineId, CancellationToken ct = default(CancellationToken))
+        public async Task DeleteAsync(Id lineId, CancellationToken ct = default(CancellationToken))
         {
-            var toDoItem = await _uow.Lines.SingleAsync(t => t.Id == new Id(lineId), ct);
+            var toDoItem = await _uow.Lines.SingleAsync(t => t.Id == lineId, ct);
             _uow.Remove(toDoItem);
             await _uow.SaveChangesAsync(ct);
         }
