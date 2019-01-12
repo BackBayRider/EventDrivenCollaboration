@@ -34,7 +34,7 @@ namespace ShipRegistryCore.Ports.Handlers
 
                 await repository.UpdateAsync(ship, cancellationToken);
 
-                await _commandProcessor.PostAsync(new ShipNameUpdatedEvent(ship.Id, command.Name));
+                await _commandProcessor.PostAsync(new ShipNameUpdatedEvent(ship.Id, command.Name, ship.Version));
             }
             
             return await base.HandleAsync(command, cancellationToken);

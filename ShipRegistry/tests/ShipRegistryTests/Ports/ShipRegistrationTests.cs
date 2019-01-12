@@ -165,6 +165,7 @@ namespace ShipRegitryTests.Ports
                 var updatedNameMessage = (ShipNameUpdatedEvent) domainEvent.Message;
                 Assert.That(updatedNameMessage.ShipId, Is.EqualTo(updatedShip.Id));
                 Assert.That(updatedNameMessage.ShipName, Is.EqualTo(updatedShip.ShipName));
+                Assert.That(updatedNameMessage.Version, Is.EqualTo(1));
                 
             }
         }
@@ -202,7 +203,8 @@ namespace ShipRegitryTests.Ports
                 var shipOwnerUpdatedEvent = (ShipOwnerUpdatedEvent) domainEvent.Message;
                 Assert.That(shipOwnerUpdatedEvent.ShipId, Is.EqualTo(updatedShip.Id));
                 Assert.That(shipOwnerUpdatedEvent.ShippingLine, Is.EqualTo(updatedShip.ShippingLineId));
-             }
+                Assert.That(shipOwnerUpdatedEvent.Version, Is.EqualTo(1));
+         }
         }
 
         [Test]
