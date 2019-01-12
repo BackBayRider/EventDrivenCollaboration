@@ -61,6 +61,7 @@ namespace ShipRegitryTests.Ports
                 Assert.That(ship.Capacity, Is.EqualTo(newShipCommand.Capacity));
                 Assert.That(ship.Id, Is.EqualTo(new Id(newShipCommand.Id)));
                 Assert.That(ship.ShippingLineId, Is.EqualTo(newShipCommand.ShippingLine));
+                Assert.That(ship.Version, Is.EqualTo(0));
 
                 var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
                 Assert.That(domainEvent, Is.Not.Null);
@@ -142,9 +143,11 @@ namespace ShipRegitryTests.Ports
 
                 await repository.AddAsync(ship);
 
+                var commandProcessor = new FakeCommandProcessor();
+
                 var command = new UpdateShipNameCommand(ship.Id, name: new ShipName("Toronto Star"));
 
-                var handler = new UpdateShipNameHandlerAsync(contextFactory);
+                var handler = new UpdateShipNameHandlerAsync(contextFactory, commandProcessor);
 
                 //act
                 await handler.HandleAsync(command);
@@ -153,6 +156,16 @@ namespace ShipRegitryTests.Ports
                 var updatedShip = await uow.Ships.SingleOrDefaultAsync(s => s.Id == ship.Id);
                 Assert.That(updatedShip , Is.Not.Null);
                 Assert.That(updatedShip.ShipName, Is.EqualTo(command.Name));
+                Assert.That(updatedShip.Version, Is.EqualTo(1));
+                Assert.That(ship.Version, Is.EqualTo(1));
+       
+                var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
+                Assert.That(domainEvent, Is.Not.Null);
+
+                var updatedNameMessage = (ShipNameUpdatedEvent) domainEvent.Message;
+                Assert.That(updatedNameMessage.ShipId, Is.EqualTo(updatedShip.Id));
+                Assert.That(updatedNameMessage.ShipName, Is.EqualTo(updatedShip.ShipName));
+                
             }
         }
 
@@ -168,9 +181,11 @@ namespace ShipRegitryTests.Ports
 
                 await repository.AddAsync(ship);
 
+                var commandProcessor = new FakeCommandProcessor();
+
                 var command = new UpdateShipOwnerCommand(ship.Id, new Id(Guid.NewGuid())); 
 
-                var handler = new UpdateShipOwnerHandlerAsync(contextFactory); 
+                var handler = new UpdateShipOwnerHandlerAsync(contextFactory, commandProcessor); 
 
                 //act
                 await handler.HandleAsync(command);
@@ -179,7 +194,15 @@ namespace ShipRegitryTests.Ports
                 var updatedShip = await uow.Ships.SingleOrDefaultAsync(s => s.Id == ship.Id);
                 Assert.That(updatedShip , Is.Not.Null);
                 Assert.That(updatedShip.ShippingLineId, Is.EqualTo(command.ShippingLineId));
-            }
+                Assert.That(ship.Version, Is.EqualTo(1));
+                
+                var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
+                Assert.That(domainEvent, Is.Not.Null);
+                
+                var shipOwnerUpdatedEvent = (ShipOwnerUpdatedEvent) domainEvent.Message;
+                Assert.That(shipOwnerUpdatedEvent.ShipId, Is.EqualTo(updatedShip.Id));
+                Assert.That(shipOwnerUpdatedEvent.ShippingLine, Is.EqualTo(updatedShip.ShippingLineId));
+             }
         }
 
         [Test]
@@ -194,9 +217,11 @@ namespace ShipRegitryTests.Ports
 
                 await repository.AddAsync(ship);
 
+                var commandProcessor = new FakeCommandProcessor();
+                
                 var command = new RemoveShipCommand(ship.Id); 
 
-                var handler = new RemoveShipHandlerAsync(contextFactory); 
+                var handler = new RemoveShipHandlerAsync(contextFactory, commandProcessor); 
 
                 //act
                 await handler.HandleAsync(command);
@@ -204,7 +229,13 @@ namespace ShipRegitryTests.Ports
                 //assert
                 var removedShip = await uow.Ships.SingleOrDefaultAsync(s => s.Id == ship.Id);
                 Assert.That(removedShip, Is.Null);
-            }
+                
+                var domainEvent = commandProcessor.Messages.SingleOrDefault(m => m.Action == Action.Post);
+                Assert.That(domainEvent, Is.Not.Null);
+                
+                var shipRemovedEvent = (ShipRemovedEvent) domainEvent.Message;
+                Assert.That(shipRemovedEvent.ShipRemoved, Is.EqualTo(ship.Id));
+             }
             
         }
   }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Paramore.Brighter;
 using ShipRegistryCore.Adapters.Repositories;
 using ShipRegistryCore.Ports.Commands;
+using ShipRegistryCore.Ports.Events;
 using ShipRegistryCore.Ports.Exceptions;
 using ShipRegistryCore.Ports.Repositories;
 
@@ -11,10 +12,14 @@ namespace ShipRegistryCore.Ports.Handlers
     public class UpdateShipOwnerHandlerAsync : RequestHandlerAsync<UpdateShipOwnerCommand>
     {
         private readonly IShipRegistryContextFactory _contextFactory;
+        private readonly IAmACommandProcessor _commandProcessor;
 
-        public UpdateShipOwnerHandlerAsync(IShipRegistryContextFactory contextFactory)
+        public UpdateShipOwnerHandlerAsync(
+            IShipRegistryContextFactory contextFactory,
+            IAmACommandProcessor commandProcessor)
         {
             _contextFactory = contextFactory;
+            _commandProcessor = commandProcessor;
         }
 
         public override async Task<UpdateShipOwnerCommand> HandleAsync(UpdateShipOwnerCommand command, CancellationToken cancellationToken = new CancellationToken())
@@ -29,6 +34,7 @@ namespace ShipRegistryCore.Ports.Handlers
 
                 await repository.UpdateAsync(ship, cancellationToken);
 
+                await _commandProcessor.PostAsync(new ShipOwnerUpdatedEvent(ship.Id, command.ShippingLineId));
             }
                         
             return await base.HandleAsync(command, cancellationToken);

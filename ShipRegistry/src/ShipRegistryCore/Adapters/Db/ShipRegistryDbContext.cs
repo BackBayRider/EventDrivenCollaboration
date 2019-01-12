@@ -60,6 +60,11 @@ namespace ShipRegistryCore.Adapters.Db
                 .HasColumnName("LineId")
                 .HasConversion(sli => sli.Value, v => new Id(v))
                 .IsRequired();
+
+            modelBuilder.Entity<Ship>()
+                .Property(s => s.Version)
+                .HasColumnName("Version")
+                .IsRequired();
                 
             modelBuilder.Entity<ShippingLine>()
                 .Property(sl => sl.Id)

@@ -33,11 +33,12 @@ namespace ShipRegistryCore.Ports.Handlers
                 
                 await repo.AddAsync(ship);
                 
-                _commandProcessor.Post(
-                    new NewShipAddedEvent(ship.Id, ship.ShipType, ship.ShipName, ship.Capacity, ship.ShippingLineId)
+                await _commandProcessor.PostAsync(
+                    new NewShipAddedEvent(ship.Id, ship.ShipType, ship.ShipName, ship.Capacity, ship.ShippingLineId),
+                    cancellationToken: cancellationToken
                     );
             }
-            
+           
             
             return await base.HandleAsync(command, cancellationToken);
         }

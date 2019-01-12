@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ShipRegistryCore.Adapters.Db;
 using ShipRegistryCore.Application;
+using ShipRegistryCore.Ports.Events;
 using ShipRegistryCore.Ports.Repositories;
 
 namespace ShipRegistryCore.Adapters.Repositories
@@ -44,6 +45,7 @@ namespace ShipRegistryCore.Adapters.Repositories
         
         public async Task UpdateAsync(Ship updatedEntity, CancellationToken ct = new CancellationToken())
         {
+            updatedEntity.Version++;
             await _uow.SaveChangesAsync(ct);
         }
     }
