@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\ShipRegistryCore\ShipRegistryCore.csproj" />
+      <ProjectReference Include="..\..\src\ShipRegistryPorts\ShipRegistryPorts.csproj" />
     </ItemGroup>
 
 </Project>

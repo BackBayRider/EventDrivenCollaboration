@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using FreightCaptainTests.Test_Doubles;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using ShipRegistryCore.Adapters.Db;
-using ShipRegistryCore.Adapters.Repositories;
-using ShipRegistryCore.Application;
-using ShipRegistryCore.Ports.Commands;
-using ShipRegistryCore.Ports.Events;
-using ShipRegistryCore.Ports.Handlers;
-using ShipRegistryCore.Ports.Queries;
+using ShipRegistryApplication;
+using ShipRegistryPorts.Commands;
+using ShipRegistryPorts.Db;
+using ShipRegistryPorts.Events;
+using ShipRegistryPorts.Handlers;
+using ShipRegistryPorts.Queries;
+using ShipRegistryPorts.Repositories;
 using Action = FreightCaptainTests.Test_Doubles.Action;
 
-namespace ShipRegitryTests.Ports
+namespace FreightCaptainTests.Ports
 {
     [TestFixture]
     public class ShipRegistrationTests

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using ShipRegistryCore.Adapters.Db;
+using ShipRegistryPorts.Db;
+using ShipRegistryPorts.Repositories;
 
 namespace FreightCaptainTests.Test_Doubles
 {
