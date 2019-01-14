@@ -2,6 +2,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Paramore.Darker;
+using Paramore.Darker.Policies;
+using Paramore.Darker.QueryLogging;
 using ShipRegistryPorts.Exceptions;
 using ShipRegistryPorts.Queries;
 using ShipRegistryPorts.Repositories;
@@ -17,6 +19,8 @@ namespace ShipRegistryPorts.Handlers
             _contextFactory = contextFactory;
         }
 
+        [QueryLogging(1)]
+        [RetryableQuery(2)]
         public override async Task<ShippingLineByIdQueryResult> ExecuteAsync(ShippingLineByIdQuery query, CancellationToken cancellationToken = new CancellationToken())
         {
             using (var uow = _contextFactory.Create())

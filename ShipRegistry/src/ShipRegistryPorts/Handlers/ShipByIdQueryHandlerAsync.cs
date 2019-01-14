@@ -1,6 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Paramore.Brighter;
+using Paramore.Brighter.Logging.Attributes;
+using Paramore.Brighter.Policies.Attributes;
 using Paramore.Darker;
 using ShipRegistryPorts.Exceptions;
 using ShipRegistryPorts.Queries;
@@ -18,7 +21,10 @@ namespace ShipRegistryPorts.Handlers
         }
         
         
-        public override async Task<ShipByIdQueryResult> ExecuteAsync(ShipByIdQuery query, CancellationToken cancellationToken = new CancellationToken())
+        [RequestLoggingAsync(step: 1, timing: HandlerTiming.Before)]
+        [UsePolicyAsync(policy: CommandProcessor.CIRCUITBREAKERASYNC, step:2)]
+        [UsePolicyAsync(policy: CommandProcessor.RETRYPOLICYASYNC, step: 3)]
+ public override async Task<ShipByIdQueryResult> ExecuteAsync(ShipByIdQuery query, CancellationToken cancellationToken = new CancellationToken())
         {
             using (var uow = _contextFactory.Create())
             {

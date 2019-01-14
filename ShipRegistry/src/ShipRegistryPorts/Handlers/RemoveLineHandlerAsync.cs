@@ -1,6 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Paramore.Brighter;
+using Paramore.Brighter.Logging.Attributes;
+using Paramore.Brighter.Policies.Attributes;
 using ShipRegistryPorts.Commands;
 using ShipRegistryPorts.Repositories;
 
@@ -15,7 +17,10 @@ namespace ShipRegistryPorts.Handlers
             _contextFactory = contextFactory;
         }
 
-        public override async Task<RemoveLineCommand> HandleAsync(RemoveLineCommand command, CancellationToken cancellationToken = new CancellationToken())
+        [RequestLoggingAsync(step: 1, timing: HandlerTiming.Before)]
+        [UsePolicyAsync(policy: CommandProcessor.CIRCUITBREAKERASYNC, step:2)]
+        [UsePolicyAsync(policy: CommandProcessor.RETRYPOLICYASYNC, step: 3)]
+         public override async Task<RemoveLineCommand> HandleAsync(RemoveLineCommand command, CancellationToken cancellationToken = new CancellationToken())
         {
             using (var uow = _contextFactory.Create())
             {
