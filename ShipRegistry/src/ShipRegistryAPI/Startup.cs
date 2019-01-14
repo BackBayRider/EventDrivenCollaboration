@@ -20,10 +20,12 @@ using Paramore.Darker;
 using Paramore.Darker.Builder;
 using Paramore.Darker.SimpleInjector;
 using Polly;
+using ShipRegistryAPI.Factories;
 using ShipRegistryPorts.BrighterFactories;
 using ShipRegistryPorts.Db;
 using ShipRegistryPorts.Handlers;
 using ShipRegistryPorts.Mappers;
+using ShipRegistryPorts.Repositories;
 using SimpleInjector;
 using SimpleInjector.Integration.AspNetCore.Mvc;
 using SimpleInjector.Lifestyles;
@@ -90,9 +92,18 @@ namespace ShipRegistryAPI
         {
             _container.Register<DbContextOptions<ShipRegistryDbContext>>( 
                 () => new DbContextOptionsBuilder<ShipRegistryDbContext>()
-                    .UseMySql(Configuration["Database:Greetings"])
+                    .UseMySql(Configuration["Database:ShipRegistry"])
                     .Options, 
                 Lifestyle.Singleton);
+            
+            _container.Register<IShipRegistryContextFactory>(
+                () => new ShipRegistryContextFactory(
+                    new DbContextOptionsBuilder<ShipRegistryDbContext>()
+                        .UseMySql(Configuration["Database:ShipRegistry"])
+                        .Options
+                    ),
+                Lifestyle.Singleton
+                );
             
             _container.RegisterMvcControllers(app);
             _container.RegisterMvcViewComponents(app);
@@ -148,7 +159,9 @@ namespace ShipRegistryAPI
 
             var servicesHandlerFactory = new ServicesHandlerFactoryAsync(_container);
 
-            var messagingGatewayConfiguration = RmqGatewayBuilder.With.Uri(new Uri(Configuration["RabbitMQ:Uri"])).Exchange(Configuration["RabbitMQ:Exchange"]).DefaultQueues();
+            var messagingGatewayConfiguration = RmqGatewayBuilder.With.Uri(new Uri(Configuration["Broker:Uri"]))
+                .Exchange(Configuration["Broker:Exchange"])
+                .DefaultQueues();
 
             var gateway = new RmqMessageProducer(messagingGatewayConfiguration);
             var sqlMessageStore = new MySqlMessageStore(new MySqlMessageStoreConfiguration(Configuration["Database:MessageStore"], Configuration["Database:MessageTableName"]));

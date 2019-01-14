@@ -6,18 +6,19 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - BROKER=amqp://guest:guest@freightcaptain_broker:5672
+      - Broker__Uri=amqp://guest:guest@freightcaptain_broker:5672
+      - Broker__Exchange="EDC.FreightCaptain.Exchange"
       - Database__ShipRegistry=Server=freightcaptain_db;Uid=root;Pwd=root;Database=ShipRegistry
       - Database__ShipRegistryDb=Server=freightcaptain_db;Uid=root;Pwd=root
       - Database__MessageStore=Server=freightcaptain_db;Uid=root;Pwd=root;Database=ShipRegistry
       - Database__MessageTableName=Messages
     links:
-      - rabbit:greetings_broker
-      - mysql:greetings_db
+      - rabbit:gfreightcaptain_broker
+      - mysql:freightcaptain_db
     depends_on:
       - rabbit
       - mysql
- rabbit:
+  rabbit:
     image: rabbitmq:3-management
     hostname: freightcaptain_broker
     environment:
