@@ -19,6 +19,9 @@ using Paramore.Brighter.MessagingGateway.RMQ.MessagingGatewayConfiguration;
 using Paramore.Darker;
 using Paramore.Darker.Builder;
 using Paramore.Darker.SimpleInjector;
+using Paramore.Darker.Policies;
+using Paramore.Darker.Logging;
+using Paramore.Darker.QueryLogging;
 using Polly;
 using ShipRegistryAPI.Factories;
 using ShipRegistryPorts.BrighterFactories;
@@ -119,7 +122,11 @@ namespace ShipRegistryAPI
         {
             var retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(new[] { TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(150) });
             var circuitBreakerPolicy = Policy.Handle<Exception>().CircuitBreakerAsync(1, TimeSpan.FromMilliseconds(500));
-            var policyRegistry = new PolicyRegistry {{CommandProcessor.RETRYPOLICYASYNC, retryPolicy}, {CommandProcessor.CIRCUITBREAKERASYNC, circuitBreakerPolicy}};
+            var policyRegistry = new Paramore.Darker.Policies.PolicyRegistry
+            {
+                {Paramore.Darker.Policies.Constants.RetryPolicyName, retryPolicy}, 
+                {Paramore.Darker.Policies.Constants.CircuitBreakerPolicyName, circuitBreakerPolicy}
+            };
 
             Func<Type, object> simpleFactory = type =>  _container.GetInstance(type);
 
@@ -127,9 +134,11 @@ namespace ShipRegistryAPI
                 .SimpleInjectorHandlers(_container, opts =>
                     opts.WithQueriesAndHandlersFromAssembly(typeof(NewShipRegistrationHandlerAsync).Assembly))
                 .InMemoryQueryContextFactory()
+                .Policies(policyRegistry)
+                .JsonQueryLogging()
                 .Build();
             
-            _container.RegisterSingleton<IQueryProcessor>(queryProcessor);
+            _container.RegisterInstance<IQueryProcessor>(queryProcessor);
 
         }
 
@@ -149,7 +158,7 @@ namespace ShipRegistryAPI
             var circuitBreakerPolicy = Policy.Handle<Exception>().CircuitBreaker(1, TimeSpan.FromMilliseconds(500));
             var retryPolicyAsync = Policy.Handle<Exception>().WaitAndRetryAsync(new[] { TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(150) });
             var circuitBreakerPolicyAsync = Policy.Handle<Exception>().CircuitBreakerAsync(1, TimeSpan.FromMilliseconds(500));
-            var policyRegistry = new PolicyRegistry()
+            var policyRegistry = new Paramore.Brighter.PolicyRegistry()
             {
                 { CommandProcessor.RETRYPOLICY, retryPolicy },
                 { CommandProcessor.CIRCUITBREAKER, circuitBreakerPolicy },
@@ -187,7 +196,7 @@ namespace ShipRegistryAPI
                 .RequestContextFactory(new Paramore.Brighter.InMemoryRequestContextFactory())
                 .Build();
 
-            _container.RegisterSingleton<IAmACommandProcessor>(commandProcessor);
+            _container.RegisterInstance<IAmACommandProcessor>(commandProcessor);
         }
         
         private void RegisterBrighterHandlersFromAssembly(Type interfaceType, IEnumerable<Assembly> assemblies, Assembly assembly, SubscriberRegistry subscriberRegistry)
